@@ -3,7 +3,7 @@ package nayan92.moneytransfer.controller;
 import nayan92.moneytransfer.controller.mapper.AccountMapper;
 import nayan92.moneytransfer.data.request.TransferRequest;
 import nayan92.moneytransfer.data.response.Account;
-import nayan92.moneytransfer.db.dao.AccountDAO;
+import nayan92.moneytransfer.db.dao.AccountDao;
 import nayan92.moneytransfer.db.data.BulkUpdate;
 import nayan92.moneytransfer.db.entity.DbAccount;
 
@@ -15,17 +15,17 @@ import static java.util.Arrays.asList;
 
 public class TransactionController {
 
-    private final AccountDAO accountDAO;
+    private final AccountDao accountDao;
     private final AccountMapper accountMapper;
 
-    public TransactionController(AccountDAO accountDAO, AccountMapper accountMapper) {
-        this.accountDAO = accountDAO;
+    public TransactionController(AccountDao accountDao, AccountMapper accountMapper) {
+        this.accountDao = accountDao;
         this.accountMapper = accountMapper;
     }
 
     public List<Account> transfer(TransferRequest transferRequest) {
-        DbAccount fromAccount = accountDAO.getAccountById(transferRequest.getFromAccountId());
-        DbAccount toAccount = accountDAO.getAccountById(transferRequest.getToAccountId());
+        DbAccount fromAccount = accountDao.getAccountById(transferRequest.getFromAccountId()).get();
+        DbAccount toAccount = accountDao.getAccountById(transferRequest.getToAccountId()).get();
 
         int fromAccountNewBalance = fromAccount.getBalance() - transferRequest.getAmount();
         int toAccountNewBalance = toAccount.getBalance() + transferRequest.getAmount();
@@ -33,10 +33,10 @@ public class TransactionController {
         BulkUpdate fromAccountUpdate = new BulkUpdate(fromAccount.getAccountId(), fromAccountNewBalance);
         BulkUpdate toAccountUpdate = new BulkUpdate(toAccount.getAccountId(), toAccountNewBalance);
 
-        accountDAO.bulkUpdateBalance(asList(fromAccountUpdate, toAccountUpdate));
+        accountDao.bulkUpdateBalance(asList(fromAccountUpdate, toAccountUpdate));
 
-        DbAccount newFromAccount = accountDAO.getAccountById(transferRequest.getFromAccountId());
-        DbAccount newToAccount = accountDAO.getAccountById(transferRequest.getToAccountId());
+        DbAccount newFromAccount = accountDao.getAccountById(transferRequest.getFromAccountId()).get();
+        DbAccount newToAccount = accountDao.getAccountById(transferRequest.getToAccountId()).get();
 
         return Stream.of(newFromAccount, newToAccount)
                 .map(accountMapper::map)

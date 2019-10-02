@@ -4,13 +4,16 @@ import nayan92.moneytransfer.db.JdbiProvider;
 import nayan92.moneytransfer.db.data.BulkUpdate;
 import nayan92.moneytransfer.db.entity.DbAccount;
 
+import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
-public class AccountDAO {
+public class AccountDao {
 
     private final JdbiProvider dbProvider;
 
-    public AccountDAO(JdbiProvider dbProvider) {
+    @Inject
+    public AccountDao(JdbiProvider dbProvider) {
         this.dbProvider = dbProvider;
     }
 
@@ -32,12 +35,12 @@ public class AccountDAO {
         });
     }
 
-    public DbAccount getAccountById(int accountId) {
+    public Optional<DbAccount> getAccountById(int accountId) {
         return dbProvider.get().withHandle(handle -> {
             return handle.createQuery("select * from account where account_id = :accountId")
                     .bind("accountId", accountId)
                     .mapTo(DbAccount.class)
-                    .one();
+                    .findOne();
         });
     }
 

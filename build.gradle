@@ -61,6 +61,7 @@ dependencies {
     compile "com.google.code.gson:gson:2.8.5"
 
     testCompile "junit:junit:4.12"
+    testCompile "org.hamcrest:hamcrest:2.1"
 
     functionalTestCompile 'io.rest-assured:rest-assured:4.1.1'
 }
