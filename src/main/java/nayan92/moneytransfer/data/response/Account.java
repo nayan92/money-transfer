@@ -18,7 +18,7 @@ public class Account {
     }
 
     public int getAccountId() {
-        return this.getAccountId();
+        return this.accountId;
     }
 
 }

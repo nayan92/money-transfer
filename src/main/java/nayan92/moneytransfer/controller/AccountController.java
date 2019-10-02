@@ -1,6 +1,7 @@
 package nayan92.moneytransfer.controller;
 
 import nayan92.moneytransfer.controller.mapper.AccountMapper;
+import nayan92.moneytransfer.data.exception.AccountNotFoundException;
 import nayan92.moneytransfer.data.request.NewAccountRequest;
 import nayan92.moneytransfer.data.response.Account;
 import nayan92.moneytransfer.db.dao.AccountDao;
@@ -33,8 +34,9 @@ public class AccountController {
                 .collect(Collectors.toList());
     }
 
-    public Account getAccountById(int accountId) {
-        DbAccount account = accountDao.getAccountById(accountId).get();
+    public Account getAccountById(int accountId) throws AccountNotFoundException {
+        DbAccount account = accountDao.getAccountById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException(accountId));
         return accountMapper.map(account);
     }
 

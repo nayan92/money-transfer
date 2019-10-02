@@ -62,6 +62,7 @@ dependencies {
 
     testCompile "junit:junit:4.12"
     testCompile "org.hamcrest:hamcrest:2.1"
+    testCompile "org.mockito:mockito-core:3.0.0"
 
     functionalTestCompile 'io.rest-assured:rest-assured:4.1.1'
 }
