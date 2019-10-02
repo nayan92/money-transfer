@@ -14,12 +14,12 @@ public class AccountDAO {
         this.dbProvider = dbProvider;
     }
 
-    public long createAccount(long balance) {
+    public int createAccount(int balance) {
         return dbProvider.get().withHandle(handle -> {
             return handle.createUpdate("insert into account (balance) values (:balance)")
                     .bind("balance", balance)
                     .executeAndReturnGeneratedKeys("account_id")
-                    .mapTo(Long.class)
+                    .mapTo(Integer.class)
                     .one();
         });
     }
@@ -32,7 +32,7 @@ public class AccountDAO {
         });
     }
 
-    public DbAccount getAccountById(long accountId) {
+    public DbAccount getAccountById(int accountId) {
         return dbProvider.get().withHandle(handle -> {
             return handle.createQuery("select * from account where account_id = :accountId")
                     .bind("accountId", accountId)

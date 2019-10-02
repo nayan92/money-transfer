@@ -20,7 +20,7 @@ public class AccountController {
     }
 
     public Account createAccount(NewAccountRequest newAccountRequest) {
-        long accountId = accountDAO.createAccount(newAccountRequest.getBalance());
+        int accountId = accountDAO.createAccount(newAccountRequest.getBalance());
         return accountMapper.map(new DbAccount(accountId, newAccountRequest.getBalance()));
     }
 
@@ -31,7 +31,7 @@ public class AccountController {
                 .collect(Collectors.toList());
     }
 
-    public Account getAccountById(long accountId) {
+    public Account getAccountById(int accountId) {
         DbAccount account = accountDAO.getAccountById(accountId);
         return accountMapper.map(account);
     }

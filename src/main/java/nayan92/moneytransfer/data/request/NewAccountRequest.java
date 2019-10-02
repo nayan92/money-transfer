@@ -2,13 +2,13 @@ package nayan92.moneytransfer.data.request;
 
 public class NewAccountRequest {
 
-    private long balance;
+    private int balance;
 
-    public void setBalance(long balance) {
+    public void setBalance(int balance) {
         this.balance = balance;
     }
 
-    public long getBalance() {
+    public int getBalance() {
         return this.balance;
     }
 }

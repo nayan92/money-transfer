@@ -2,19 +2,19 @@ package nayan92.moneytransfer.db.data;
 
 public class BulkUpdate {
 
-    private final long accountId;
-    private final long newBalance;
+    private final int accountId;
+    private final int newBalance;
 
-    public BulkUpdate(long accountId, long newBalance) {
+    public BulkUpdate(int accountId, int newBalance) {
         this.accountId = accountId;
         this.newBalance = newBalance;
     }
 
-    public long getAccountId() {
+    public int getAccountId() {
         return accountId;
     }
 
-    public long getNewBalance() {
+    public int getNewBalance() {
         return newBalance;
     }
 }

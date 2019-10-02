@@ -2,8 +2,6 @@ package nayan92.moneytransfer;
 
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
-
 public class APITest {
 
     @Test

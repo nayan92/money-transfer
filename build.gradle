@@ -20,11 +20,19 @@ sourceSets {
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
+    functionalTest {
+        java.srcDir "$projectDir/src/functional/java"
+        resources.srcDir "$projectDir/src/functional/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
 }
 
 configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
+    functionalTestCompile.extendsFrom integrationTestCompile
+    functionalTestRuntime.extendsFrom functionalTestCompile
 }
 
 task integrationTest(type: Test) {
@@ -32,8 +40,15 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
+task functionalTest(type: Test) {
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
 check.dependsOn integrationTest
+check.dependsOn functionalTest
 integrationTest.mustRunAfter test
+functionalTest.mustRunAfter integrationTest
 
 dependencies {
     compile "com.sparkjava:spark-core:2.8.0"
@@ -47,7 +62,7 @@ dependencies {
 
     testCompile "junit:junit:4.12"
 
-    integrationTestCompile 'io.rest-assured:rest-assured:4.1.1'
+    functionalTestCompile 'io.rest-assured:rest-assured:4.1.1'
 }
 
 jar {

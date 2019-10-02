@@ -26,27 +26,35 @@ public class Router {
     public void start() {
         path("/accounts", () -> {
             get("", (request, response) -> {
+                response.type("application/json");
                 List<Account> allAccounts = accountController.getAllAccounts();
                 return gson.toJson(allAccounts);
             });
             post("", (request, response) -> {
+                response.type("application/json");
                 NewAccountRequest newAccountRequest = gson.fromJson(request.body(), NewAccountRequest.class);
                 Account newAccount = accountController.createAccount(newAccountRequest);
                 return gson.toJson(newAccount);
             });
             path("/:id", () -> {
                 get("", (request, response) -> {
-                    long accountId = Long.parseLong(request.params("id"));
+                    response.type("application/json");
+                    int accountId = Integer.parseInt(request.params("id"));
                     Account account = accountController.getAccountById(accountId);
                     return gson.toJson(account);
                 });
             });
         });
         post("/transactions", (request, response) -> {
+            response.type("application/json");
             TransferRequest transferRequest = gson.fromJson(request.body(), TransferRequest.class);
             List<Account> updatedAccounts = transactionController.transfer(transferRequest);
             return gson.toJson(updatedAccounts);
         });
+    }
+
+    public void kill() {
+        stop();
     }
 
 }

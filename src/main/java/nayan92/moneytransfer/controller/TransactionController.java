@@ -27,8 +27,8 @@ public class TransactionController {
         DbAccount fromAccount = accountDAO.getAccountById(transferRequest.getFromAccountId());
         DbAccount toAccount = accountDAO.getAccountById(transferRequest.getToAccountId());
 
-        long fromAccountNewBalance = fromAccount.getBalance() - transferRequest.getAmount();
-        long toAccountNewBalance = toAccount.getBalance() + transferRequest.getAmount();
+        int fromAccountNewBalance = fromAccount.getBalance() - transferRequest.getAmount();
+        int toAccountNewBalance = toAccount.getBalance() + transferRequest.getAmount();
 
         BulkUpdate fromAccountUpdate = new BulkUpdate(fromAccount.getAccountId(), fromAccountNewBalance);
         BulkUpdate toAccountUpdate = new BulkUpdate(toAccount.getAccountId(), toAccountNewBalance);

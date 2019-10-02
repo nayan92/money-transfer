@@ -2,19 +2,19 @@ package nayan92.moneytransfer.db.entity;
 
 public class DbAccount {
 
-    private final long accountId;
-    private final long balance;
+    private final int accountId;
+    private final int balance;
 
-    public DbAccount(long accountId, long balance) {
+    public DbAccount(int accountId, int balance) {
         this.accountId = accountId;
         this.balance = balance;
     }
 
-    public long getAccountId() {
+    public int getAccountId() {
         return accountId;
     }
 
-    public long getBalance() {
+    public int getBalance() {
         return balance;
     }
 

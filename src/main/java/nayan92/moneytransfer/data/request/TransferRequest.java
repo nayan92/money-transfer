@@ -2,31 +2,31 @@ package nayan92.moneytransfer.data.request;
 
 public class TransferRequest {
 
-    private long fromAccountId;
-    private long toAccountId;
-    private long amount;
+    private int fromAccountId;
+    private int toAccountId;
+    private int amount;
 
-    public void setFromAccountId(long fromAccountId) {
+    public void setFromAccountId(int fromAccountId) {
         this.fromAccountId = fromAccountId;
     }
 
-    public long getFromAccountId() {
+    public int getFromAccountId() {
         return this.fromAccountId;
     }
 
-    public void setToAccountId(long toAccountId) {
+    public void setToAccountId(int toAccountId) {
         this.toAccountId = toAccountId;
     }
 
-    public long getToAccountId() {
+    public int getToAccountId() {
         return toAccountId;
     }
 
-    public void setAmount(long amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
-    public long getAmount() {
+    public int getAmount() {
         return amount;
     }
 }

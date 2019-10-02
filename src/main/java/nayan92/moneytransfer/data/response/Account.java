@@ -2,22 +2,22 @@ package nayan92.moneytransfer.data.response;
 
 public class Account {
 
-    private long accountId;
-    private long balance;
+    private int accountId;
+    private int balance;
 
-    public void setBalance(long balance) {
+    public void setBalance(int balance) {
         this.balance = balance;
     }
 
-    public long getBalance() {
+    public int getBalance() {
         return this.balance;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(int accountId) {
         this.accountId = accountId;
     }
 
-    public long getAccountId() {
+    public int getAccountId() {
         return this.getAccountId();
     }
 

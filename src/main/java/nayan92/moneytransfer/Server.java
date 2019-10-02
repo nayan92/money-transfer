@@ -11,6 +11,8 @@ import org.flywaydb.core.Flyway;
 
 public class Server {
 
+    private Router router;
+
     public void start() {
         Flyway flyway = Flyway.configure()
                 .dataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false", "", "")
@@ -24,10 +26,14 @@ public class Server {
 
         AccountController accountController = new AccountController(accountDAO, accountMapper);
         TransactionController transactionController = new TransactionController(accountDAO, accountMapper);
-        Router router = new Router(accountController, transactionController);
+        router = new Router(accountController, transactionController);
 
         dbProvider.initialise();
         router.start();
+    }
+
+    public void stop() {
+        router.kill();
     }
 
 }
