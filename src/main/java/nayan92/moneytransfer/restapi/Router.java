@@ -7,6 +7,7 @@ import nayan92.moneytransfer.data.request.NewAccountRequest;
 import nayan92.moneytransfer.data.request.TransferRequest;
 import nayan92.moneytransfer.data.response.Account;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static spark.Spark.*;
@@ -15,9 +16,9 @@ public class Router {
 
     private final AccountController accountController;
     private final TransactionController transactionController;
+    private final Gson gson = new Gson();
 
-    private final Gson gson = new Gson(); // TODO pull out into utils
-
+    @Inject
     public Router(AccountController accountController, TransactionController transactionController) {
         this.accountController = accountController;
         this.transactionController = transactionController;

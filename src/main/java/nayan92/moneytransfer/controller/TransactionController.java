@@ -7,6 +7,7 @@ import nayan92.moneytransfer.db.dao.AccountDao;
 import nayan92.moneytransfer.db.data.BulkUpdate;
 import nayan92.moneytransfer.db.entity.DbAccount;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +19,7 @@ public class TransactionController {
     private final AccountDao accountDao;
     private final AccountMapper accountMapper;
 
+    @Inject
     public TransactionController(AccountDao accountDao, AccountMapper accountMapper) {
         this.accountDao = accountDao;
         this.accountMapper = accountMapper;

@@ -6,6 +6,7 @@ import nayan92.moneytransfer.data.response.Account;
 import nayan92.moneytransfer.db.dao.AccountDao;
 import nayan92.moneytransfer.db.entity.DbAccount;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ public class AccountController {
     private final AccountDao accountDao;
     private final AccountMapper accountMapper;
 
+    @Inject
     public AccountController(AccountDao accountDao, AccountMapper accountMapper) {
         this.accountDao = accountDao;
         this.accountMapper = accountMapper;
