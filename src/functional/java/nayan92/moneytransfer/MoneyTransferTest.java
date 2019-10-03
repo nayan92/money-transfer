@@ -10,9 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MoneyTransferTest {
@@ -59,18 +59,42 @@ public class MoneyTransferTest {
         int toAccountId = createAccountWithBalance(500);
         int amountToTransfer = 5;
         ExecutorService executor = Executors.newFixedThreadPool(50);
-        for (int i = 0; i < 50; i++) {
+
+        performMultipleConcurrentTransfers(executor, 50, fromAccountId, toAccountId, amountToTransfer);
+        executor.shutdown();
+        executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+
+        assertThat(getBalanceForAccountId(fromAccountId), equalTo(250));
+        assertThat(getBalanceForAccountId(toAccountId), equalTo(750));
+    }
+
+    @Test
+    public void multiple_transfers_between_accounts_should_not_block() throws InterruptedException {
+        int account1 = createAccountWithBalance(500);
+        int account2 = createAccountWithBalance(500);
+        int amountToTransfer = 5;
+        ExecutorService executor = Executors.newFixedThreadPool(50);
+
+        performMultipleConcurrentTransfers(executor, 25, account1, account2, amountToTransfer);
+        performMultipleConcurrentTransfers(executor, 25, account2, account1, amountToTransfer);
+        executor.shutdown();
+
+        boolean didNotTimeout = executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+
+        assertThat(didNotTimeout, is(true));
+        assertThat(getBalanceForAccountId(account1), equalTo(500));
+        assertThat(getBalanceForAccountId(account2), equalTo(500));
+    }
+
+    private void performMultipleConcurrentTransfers(ExecutorService executor, int numberOfRequests, int fromAccountId, int toAccountId, int amount) {
+        for (int i = 0; i < numberOfRequests; i++) {
             executor.execute(() -> {
                 given()
-                    .body(String.format("{ \"fromAccountId\": %d, \"toAccountId\": %d, \"amount\": %d }", fromAccountId, toAccountId, amountToTransfer))
+                    .body(String.format("{ \"fromAccountId\": %d, \"toAccountId\": %d, \"amount\": %d }", fromAccountId, toAccountId, amount))
                 .when()
                     .post("/transactions");
             });
         }
-        executor.awaitTermination(10000, TimeUnit.MILLISECONDS);
-
-        assertThat(getBalanceForAccountId(fromAccountId), equalTo(250));
-        assertThat(getBalanceForAccountId(toAccountId), equalTo(750));
     }
 
     private int createAccountWithBalance(int balance) {
