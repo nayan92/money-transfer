@@ -15,10 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
@@ -27,8 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionControllerTest {
@@ -49,8 +45,8 @@ public class TransactionControllerTest {
     @Before
     public void setUp() {
         AccountMapper accountMapper = new AccountMapper();
-        when(lockManager.getLockForId(1)).thenReturn(accountLock1);
-        when(lockManager.getLockForId(2)).thenReturn(accountLock2);
+        when(lockManager.getLockForId(accountId1)).thenReturn(accountLock1);
+        when(lockManager.getLockForId(accountId2)).thenReturn(accountLock2);
         transactionController = new TransactionController(accountDao, accountMapper, lockManager);
     }
 
@@ -131,6 +127,84 @@ public class TransactionControllerTest {
             samePropertyValuesAs(expectedAccount(accountId1, 50)),
             samePropertyValuesAs(expectedAccount(accountId2, 150))
         ));
+    }
+
+    @Test
+    public void transfer_should_throw_exception_if_transferring_between_the_same_account() throws InsufficientFundsException, AccountNotFoundException, SameAccountTransferException {
+        TransferRequest request = transferRequest(accountId1, accountId1, 50);
+
+        thrown.expect(SameAccountTransferException.class);
+
+        transactionController.transfer(request);
+    }
+
+    @Test
+    public void transfer_should_obtain_the_lock_for_from_account_first_if_from_account_id_smaller_than_to_account_id() throws InsufficientFundsException, AccountNotFoundException, SameAccountTransferException {
+        int fromAccountId = 50;
+        int toAccountId = 100;
+        when(accountDao.getAccountById(fromAccountId)).thenReturn(Optional.of(new DbAccount(fromAccountId, 100)));
+        when(accountDao.getAccountById(toAccountId)).thenReturn(Optional.of(new DbAccount(toAccountId, 100)));
+        when(lockManager.getLockForId(fromAccountId)).thenReturn(accountLock1);
+        when(lockManager.getLockForId(toAccountId)).thenReturn(accountLock2);
+        TransferRequest request = transferRequest(fromAccountId, toAccountId, 50);
+
+        transactionController.transfer(request);
+
+        InOrder order = inOrder(accountLock1, accountLock2);
+        order.verify(accountLock1).lock();
+        order.verify(accountLock2).lock();
+    }
+
+    @Test
+    public void transfer_should_obtain_the_lock_for_to_account_first_if_from_account_id_larger_than_to_account_id() throws InsufficientFundsException, AccountNotFoundException, SameAccountTransferException {
+        int fromAccountId = 100;
+        int toAccountId = 50;
+        when(accountDao.getAccountById(fromAccountId)).thenReturn(Optional.of(new DbAccount(fromAccountId, 100)));
+        when(accountDao.getAccountById(toAccountId)).thenReturn(Optional.of(new DbAccount(toAccountId, 100)));
+        when(lockManager.getLockForId(fromAccountId)).thenReturn(accountLock1);
+        when(lockManager.getLockForId(toAccountId)).thenReturn(accountLock2);
+        TransferRequest request = transferRequest(fromAccountId, toAccountId, 50);
+
+        transactionController.transfer(request);
+
+        InOrder order = inOrder(accountLock1, accountLock2);
+        order.verify(accountLock2).lock();
+        order.verify(accountLock1).lock();
+    }
+
+    @Test
+    public void transfer_should_unlock_in_the_opposite_order_to_locking() throws InsufficientFundsException, AccountNotFoundException, SameAccountTransferException {
+        int fromAccountId = 50;
+        int toAccountId = 100;
+        when(accountDao.getAccountById(fromAccountId)).thenReturn(Optional.of(new DbAccount(fromAccountId, 100)));
+        when(accountDao.getAccountById(toAccountId)).thenReturn(Optional.of(new DbAccount(toAccountId, 100)));
+        when(lockManager.getLockForId(fromAccountId)).thenReturn(accountLock1);
+        when(lockManager.getLockForId(toAccountId)).thenReturn(accountLock2);
+        TransferRequest request = transferRequest(fromAccountId, toAccountId, 50);
+
+        transactionController.transfer(request);
+
+        InOrder order = inOrder(accountLock1, accountLock2);
+        order.verify(accountLock2).unlock();
+        order.verify(accountLock1).unlock();
+    }
+
+    @Test
+    public void transfer_should_release_both_locks_even_if_there_is_an_exception() throws InsufficientFundsException, AccountNotFoundException, SameAccountTransferException {
+        int fromAccountId = 50;
+        int toAccountId = 100;
+        when(accountDao.getAccountById(fromAccountId)).thenReturn(Optional.empty());
+        when(accountDao.getAccountById(toAccountId)).thenReturn(Optional.empty());
+        when(lockManager.getLockForId(fromAccountId)).thenReturn(accountLock1);
+        when(lockManager.getLockForId(toAccountId)).thenReturn(accountLock2);
+        TransferRequest request = transferRequest(fromAccountId, toAccountId, 50);
+
+        try {
+            transactionController.transfer(request);
+        } catch (Exception e) {}
+
+        verify(accountLock1).unlock();
+        verify(accountLock2).unlock();
     }
 
     private TransferRequest transferRequest(int fromAccountId, int toAccountId, int amount) {
