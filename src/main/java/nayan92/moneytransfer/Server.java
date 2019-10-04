@@ -9,11 +9,13 @@ import nayan92.moneytransfer.db.JdbiProvider;
 import nayan92.moneytransfer.restapi.ApiModule;
 import nayan92.moneytransfer.restapi.Router;
 
+import java.io.IOException;
+
 public class Server {
 
     private Router router;
 
-    public void start() {
+    public void start() throws IOException {
         Injector injector = Guice.createInjector(new ControllerModule(), new ApiModule(), new DbModule());
         JdbiProvider dbProvider = injector.getInstance(JdbiProvider.class);
         router = injector.getInstance(Router.class);

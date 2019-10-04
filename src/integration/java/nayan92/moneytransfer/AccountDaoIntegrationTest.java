@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class AccountDaoIntegrationTest {
     private AccountDao accountDao;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         Injector injector = Guice.createInjector(new DbModule());
         accountDao = injector.getInstance(AccountDao.class);
         jdbiProvider = injector.getInstance(JdbiProvider.class);

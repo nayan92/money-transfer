@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ public class MoneyTransferTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         server = new Server();
         server.start();
     }
