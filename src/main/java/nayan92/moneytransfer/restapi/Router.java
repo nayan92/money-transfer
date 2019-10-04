@@ -6,6 +6,7 @@ import nayan92.moneytransfer.controller.AccountController;
 import nayan92.moneytransfer.controller.TransactionController;
 import nayan92.moneytransfer.data.exception.AccountNotFoundException;
 import nayan92.moneytransfer.data.exception.InsufficientFundsException;
+import nayan92.moneytransfer.data.exception.SameAccountTransferException;
 import nayan92.moneytransfer.data.request.NewAccountRequest;
 import nayan92.moneytransfer.data.request.TransferRequest;
 import nayan92.moneytransfer.data.response.Account;
@@ -40,12 +41,12 @@ public class Router {
         path("/accounts", () -> {
             get("", (request, response) -> {
                 List<Account> allAccounts = accountController.getAllAccounts();
-                response.status(201);
                 return gson.toJson(allAccounts);
             });
             post("", (request, response) -> {
                 NewAccountRequest newAccountRequest = gson.fromJson(request.body(), NewAccountRequest.class);
                 Account newAccount = accountController.createAccount(newAccountRequest);
+                response.status(201);
                 return gson.toJson(newAccount);
             });
             path("/:id", () -> {
@@ -69,10 +70,13 @@ public class Router {
 
     private void createExceptionHandlers() {
         exception(AccountNotFoundException.class, (exception, request, response) -> {
-            handleError(response, 404, String.format("An account with id (%s) does not exist)", exception.getAccountId()));
+            handleError(response, 404, String.format("An account with id (%s) does not exist", exception.getAccountId()));
         });
         exception(InsufficientFundsException.class, (exception, request, response) -> {
             handleError(response, 409, "The account does not have enough funds to complete the transfer");
+        });
+        exception(SameAccountTransferException.class, (exception, request, response) -> {
+            handleError(response, 409, "The transfer must be made between two different accounts");
         });
         exception(JsonSyntaxException.class, (exception, request, response) -> {
             handleError(response, 400, "The request body is invalid");
@@ -88,10 +92,12 @@ public class Router {
 
         response.status(status);
         response.body(gson.toJson(errorResponse));
+        response.type("application/json");
     }
 
     public void kill() {
         stop();
+        awaitStop();
     }
 
 }

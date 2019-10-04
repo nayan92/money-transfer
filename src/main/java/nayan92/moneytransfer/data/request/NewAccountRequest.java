@@ -11,4 +11,5 @@ public class NewAccountRequest {
     public int getBalance() {
         return this.balance;
     }
+
 }

@@ -35,7 +35,6 @@ public class TransactionController {
         Lock firstLock;
         Lock secondLock;
         if (transferRequest.getFromAccountId() == transferRequest.getToAccountId()) {
-            // TODO handle exception
             throw new SameAccountTransferException();
         } else if (transferRequest.getFromAccountId() < transferRequest.getToAccountId()) {
             firstLock = lockManager.getLockForId(transferRequest.getFromAccountId());

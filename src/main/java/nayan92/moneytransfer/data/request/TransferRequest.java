@@ -29,4 +29,6 @@ public class TransferRequest {
     public int getAmount() {
         return amount;
     }
+
+
 }
