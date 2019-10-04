@@ -37,7 +37,7 @@ It is assumed that account ids are simply integers and the monetary value is rep
     "balance": 500
   }
    ``` 
-* `POST` /transactions - perform a money transfer between two accounts, and returns the updated account details  
+* POST /transactions - perform a money transfer between two accounts, and returns the updated account details  
   Sample request body:  
   ```json 
   { 
